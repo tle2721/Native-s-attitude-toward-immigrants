@@ -13222,49 +13222,10 @@ div#notebook {
 <p>A different and more generalized measure is the sentiment of words that used in these articles. For each article, I search for an adjustive within a neighborhood of 10 words from the word of interest, e.g. <strong>immigrant, migration</strong>, and use the sentiment score provided by <a href="https://hlt-nlp.fbk.eu/technologies/sentiwords">SentiWords</a> to rate the sentiment of each article. The average sentiment of all articles within a year is considered the a measure of native's attitude toward immigrants in that period. The variance of the sentiment score is considered as the polarization of native's attitude toward immigrants.</p>
 <p>Due to the massive size of the dataset, the search query returns <em>TimeOut</em> error most of the time and hence, I decided to download the entire data set that contains the word <strong>immigrant</strong> for convenience. The entire data set of articles in text format is roughly 30GB. The python code to download the data set is included in the end of this write up for reference.</p>
 <p>Shown below are the Sentiment Indices of native's attitude toward immigrants measured using the first 500 articles returned from the search query (this limit is set due to the limitation of my computational power at the moment). The two indices are computed using sentiment scores provided by <a href="https://hlt-nlp.fbk.eu/technologies/sentiwords">SentiWords</a> which built on top of <a href="https://github.com/aesuli/sentiwordnet">SentiWordNet</a> (provided for reference).</p>
-<p>These indices provide a slightly different picture than before. The native's attitude toward immigrants seem to have declined after 1920 (after WW1) coincidence with the time Congress passed the National Origin Formula that limit immigration by country of origin. It's also important to note the sharp decline in the Polarization Indices at the end of WW1 and generally decline with respect to time.</p>
+<p>These indices provide a slightly different picture than before. The native's attitude toward immigrants seem to have declined after 1920 (after WW1) coincidence with the time Congress passed the National Origin Formula that limit immigration by country of origin. The increment of public sentiment toward immigrant after 1940 is also consistent with the earlier metrics. It's also worth noting of the sharp decline in the Polarization Indices at the end of WW1 and generally decline with respect to time.</p>
 
 </div>
 </div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Define function to clean text and find adjustive</span>
-<span class="k">def</span> <span class="nf">clean_text</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;endIndex&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;startIndex&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ocr_eng&#39;</span><span class="p">]</span>
-    <span class="n">text1</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="n">text1</span> <span class="o">=</span> <span class="n">text1</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">text1</span>
-<span class="k">def</span> <span class="nf">adj_noun</span><span class="p">(</span><span class="n">text3</span><span class="p">):</span>
-    <span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">text3</span><span class="p">)</span>
-    <span class="n">noun_adj_pairs</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">eps</span> <span class="o">=</span> <span class="mi">10</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">token</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
-        <span class="n">imm_text</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;migration&#39;</span><span class="p">,</span><span class="s1">&#39;migrate&#39;</span><span class="p">,</span><span class="s1">&#39;immigrant&#39;</span><span class="p">,</span><span class="s1">&#39;immigrants&#39;</span><span class="p">,</span><span class="s1">&#39;immigration&#39;</span><span class="p">,</span>\
-                              <span class="s1">&#39;immigrations&#39;</span><span class="p">,</span> <span class="s1">&#39;immigrate&#39;</span><span class="p">,</span><span class="s1">&#39;immigrated&#39;</span><span class="p">,</span><span class="s1">&#39;immigrates&#39;</span><span class="p">,</span><span class="s1">&#39;immigrating&#39;</span><span class="p">,</span>\
-                              <span class="s1">&#39;migrant&#39;</span><span class="p">,</span><span class="s1">&#39;migrants&#39;</span><span class="p">,</span><span class="s1">&#39;migrated&#39;</span><span class="p">,</span><span class="s1">&#39;migrating&#39;</span><span class="p">,</span><span class="s1">&#39;emigrate&#39;</span><span class="p">,</span><span class="s1">&#39;emigrates&#39;</span><span class="p">,</span><span class="s1">&#39;emigrated&#39;</span><span class="p">}</span>
-        <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imm_text</span><span class="p">:</span>
-            <span class="k">continue</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span><span class="n">i</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">pos_</span> <span class="o">==</span> <span class="s1">&#39;ADJ&#39;</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imm_text</span><span class="p">):</span>
-                <span class="n">noun_adj_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">token</span><span class="p">,</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
-                <span class="k">break</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span> <span class="o">-</span> <span class="n">eps</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">pos_</span> <span class="o">==</span> <span class="s1">&#39;ADJ&#39;</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imm_text</span><span class="p">):</span>
-                <span class="n">noun_adj_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">token</span><span class="p">,</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
-                <span class="k">break</span>
-    <span class="k">return</span> <span class="n">noun_adj_pairs</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -13381,7 +13342,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Relevant-packages">Relevant packages<a class="anchor-link" href="#Relevant-packages">&#182;</a></h2><p>In section below, I load relevant packages used for this project:</p>
+<h2 id="Relevant-packages">Relevant packages<a class="anchor-link" href="#Relevant-packages">&#182;</a></h2><p>Below are relevant packages and functions used in this project.</p>
 
 </div>
 </div>
@@ -13473,6 +13434,45 @@ div#notebook {
             <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;year&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">t0</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">json_file</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Define function to clean text and find adjustive</span>
+<span class="k">def</span> <span class="nf">clean_text</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;endIndex&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;startIndex&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ocr_eng&#39;</span><span class="p">]</span>
+    <span class="n">text1</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">text1</span> <span class="o">=</span> <span class="n">text1</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">text1</span>
+<span class="k">def</span> <span class="nf">adj_noun</span><span class="p">(</span><span class="n">text3</span><span class="p">):</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">text3</span><span class="p">)</span>
+    <span class="n">noun_adj_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">token</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+        <span class="n">imm_text</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;migration&#39;</span><span class="p">,</span><span class="s1">&#39;migrate&#39;</span><span class="p">,</span><span class="s1">&#39;immigrant&#39;</span><span class="p">,</span><span class="s1">&#39;immigrants&#39;</span><span class="p">,</span><span class="s1">&#39;immigration&#39;</span><span class="p">,</span>\
+                              <span class="s1">&#39;immigrations&#39;</span><span class="p">,</span> <span class="s1">&#39;immigrate&#39;</span><span class="p">,</span><span class="s1">&#39;immigrated&#39;</span><span class="p">,</span><span class="s1">&#39;immigrates&#39;</span><span class="p">,</span><span class="s1">&#39;immigrating&#39;</span><span class="p">,</span>\
+                              <span class="s1">&#39;migrant&#39;</span><span class="p">,</span><span class="s1">&#39;migrants&#39;</span><span class="p">,</span><span class="s1">&#39;migrated&#39;</span><span class="p">,</span><span class="s1">&#39;migrating&#39;</span><span class="p">,</span><span class="s1">&#39;emigrate&#39;</span><span class="p">,</span><span class="s1">&#39;emigrates&#39;</span><span class="p">,</span><span class="s1">&#39;emigrated&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imm_text</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">),</span><span class="n">i</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">pos_</span> <span class="o">==</span> <span class="s1">&#39;ADJ&#39;</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imm_text</span><span class="p">):</span>
+                <span class="n">noun_adj_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">token</span><span class="p">,</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+                <span class="k">break</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span> <span class="o">-</span> <span class="n">eps</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">pos_</span> <span class="o">==</span> <span class="s1">&#39;ADJ&#39;</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imm_text</span><span class="p">):</span>
+                <span class="n">noun_adj_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">token</span><span class="p">,</span><span class="n">doc</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+                <span class="k">break</span>
+    <span class="k">return</span> <span class="n">noun_adj_pairs</span>
 </pre></div>
 
     </div>
